@@ -1,0 +1,75 @@
+<style lang="less">
+
+</style>
+
+<template>
+  <view class="container">
+    <button @tap="chooseImage">nihao</button>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Toast from 'wepy-com-toast'
+  import testMixin from '../mixins/test'
+  export default class Index extends wepy.page {
+    data = {
+      name: '你哈',
+      count: 0,
+      tempFilePaths: []
+    }
+    computed = {
+      now() {
+        return this.data.name
+      }
+    }
+    methods = {
+      chooseImage() {
+        var that = this;
+        wx.chooseImage({
+          count: 9, // 默认9
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          success: function(res) {
+            var tempFilePaths = res.tempFilePaths
+            for (let i = 0; i < tempFilePaths.length; i++) {
+              new Promise(function(resolve, reject) {
+                      wx.uploadFile({
+                        url: 'http://localhost:8003', //仅为示例，非真实的接口地址
+                        filePath: tempFilePaths[i],
+                        name: 'file',
+                        contentType: "multipart/form-data",
+                        formData: {
+                          'user': 'test'
+                        },
+                        success: function(res) {
+                     
+                        }
+                      })
+                    })
+                }
+          }
+        })
+      }
+    }
+    good() {
+      var that = this;
+      return new Promise(function(resolve, reject) {
+        wx.uploadFile({
+          url: 'http://localhost:8003', //仅为示例，非真实的接口地址
+          filePath: that.tempFilePaths[that.count],
+          name: 'file',
+          contentType: "multipart/form-data",
+          formData: {
+            'user': 'test'
+          },
+          success: function(res) {
+            resolve(res)
+          }
+        })
+      })
+    }
+    events = {}
+    onLoad() {}
+  }
+</script>
